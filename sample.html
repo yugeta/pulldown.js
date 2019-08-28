@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <title>pull-down-sample</title>
+  <script src="pullDown.js"></script>
+</head>
+<body>
+  <h1>pull-down-sample</h1>
+  <input type="text" name="aaa_key" placeholder="key">
+  <input type="text" name="aaa_val" placeholder="value">
+  <hr>
+  <input type="text" name="bbb_key" placeholder="key">
+  <input type="text" name="bbb_val" placeholder="value">
+  <hr>
+  <input type="text" name="ccc_key" placeholder="key">
+  <input type="text" name="ccc_val" placeholder="value">
+
+
+<script>
+new $$pullDown({
+  datas    : [{key:1,value:"1-abc"},{key:2,value:"2-ade"},{key:3,value:"1-bef"}],  // ex)[{key:value},{key:value},{key:value},...]
+  input_match : "partial",  // ["partial":部分一致 , "forward":前方一致]
+  branc_view  : false,       // [true:ブランクで表示 , false:文字入力で表示]
+  elements : [    // ex) elm_val(value)->表示,elm_key(key,id)->非表示
+    {
+      elm_key : "[name='aaa_key']", // value値を登録するelement※任意
+      elm_val : "[name='aaa_val']"  // key(id)値を登録するelement※任意（key値は無くても可） 
+    } 
+  ],
+  attach   : function(e){console.log("attach-1")},  // 項目にアタッチした時のイベント処理
+  selected : function(e){console.log("select-1")},  // 項目を選択した後のイベント処理
+  canceled : function(e){console.log("cancel-1")}   // 項目選択をキャンセルした後のイベント処理
+});
+
+new $$pullDown({
+  datas    : [{key:1,value:"test-1"},{key:2,value:"hoge-2"},{key:3,value:"hage-3"}],
+  input_match : "partial",
+  branc_view  : true,
+  elements : [
+    {
+      elm_key : "[name='bbb_key']",
+      elm_val : "[name='bbb_val']"
+    },
+    {
+      elm_key : "[name='ccc_key']",
+      elm_val : "[name='ccc_val']"
+    },
+  ]
+});
+</script>
+</body>
+</html>
