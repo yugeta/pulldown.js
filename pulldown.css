@@ -5,8 +5,13 @@
   position:absolute;
   margin:0;
   padding:0;
-  box-shadow:2px 2px 2px rgba(0,0,0,0.3);
+  box-shadow:4px 4px 8px rgba(0,0,0,0.5);
+  max-height:200px;
+  min-height:25px;
+  overflow-x:hidden;
+  overflow-y:auto;
 }
+
 .mynt-pull-down > *{
   margin:0;
   padding:2px 8px;
@@ -14,8 +19,11 @@
   list-style:none;
 }
 .mynt-pull-down > *[data-select="1"]{
-  background-color:#FEE;
+  background-color:#EEF;
+}
+.mynt-pull-down > *[data-match="1"]{
+  background-color:#CCF !important;
 }
 .mynt-pull-down > *:hover{
-  background-color:#FEE;
+  background-color:#EEF;
 }

@@ -29,6 +29,13 @@
 
   <input type="text" name="multi_key" placeholder="key">
   <input type="text" name="multi_val" placeholder="value">
+  <select style="width:100px;" multiple="true">
+    <option>multi-1</option>
+    <option>multi-2</option>
+    <option>multi-3</option>
+    <option>multi-4</option>
+    <option>multi-5</option>
+  </select>
 
 <script>
 new $$pullDown({
@@ -62,16 +69,25 @@ new $$pullDown({
   ]
 });
 
+var datas = [
+  {key:1,value:"test-10"},
+  {key:2,value:"hoge-20"},
+  {key:3,value:"hage-30"},
+  {key:4,value:"hage-40"},
+  {key:5,value:"hage-50"}
+];
 
 new $$pullDown({
-  datas    : [{key:1,value:"test-10"},{key:2,value:"hoge-20"},{key:3,value:"hage-30"},{key:4,value:"hage-40"},{key:5,value:"hage-50"}],
+  datas    : datas,
   input_match : "always",
   brank_view  : true,
+  multiple    : true,      // 複数選択を可能にするのフラグ
+  multiple_split_string : ",", // 1項目に複数入力する際のsplit文字列
   elements : [
     {
       elm_key : "[name='multi_key']",
       elm_val : "[name='multi_val']"
-    },
+    }
   ]
 });
 
