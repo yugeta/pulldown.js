@@ -55,6 +55,30 @@
     }
     return cur;
   }
+
+
+  // options
+  var __options = {
+    class_area : "mynt-pull-down",  // 表示されたリストの親element用class名
+
+    input_match : "partial",  // ["partial":部分一致 , "forward":前方一致 , "always":常に全部表示]
+    brank_view  : true,       // [true:ブランクで表示 , false:文字入力で表示]
+
+    datas    : [],  // ex)[{key:--,value:---},{key:--,value:---},{key:--,value:---},...]
+    elements : [    // ex) elm_val(value)->表示,elm_key(key,id)->非表示
+      {
+        elm_val:null, // value値を登録するelement※任意
+        elm_key:null  // key(id)値を登録するelement※任意（key値は無くても可） 
+      } 
+    ],
+    margin   : 0,   // 入力フォームとの距離（margin-top:--px値）
+    attach   : function(){},  // 項目にアタッチした時のイベント処理
+    selected : function(){},  // 項目を選択した後のイベント処理
+    canceled : function(){}   // 項目選択をキャンセルした後のイベント処理
+  };
+
+
+
   var __construct = function(){
     switch(document.readyState){
       case "complete"    : new $$;break;
@@ -62,6 +86,7 @@
       default            : __event(window , "load" , function(){new $$});break;
 		}
   };
+  
 
 
   // setup
@@ -100,30 +125,12 @@
 
 
 
-  // options
-  $$.prototype.options = {
-    class_area : "mynt-pull-down",  // 表示されたリストの親element用class名
-
-    input_match : "partial",  // ["partial":部分一致 , "forward":前方一致 , "always":常に全部表示]
-    branc_view  : true,       // [true:ブランクで表示 , false:文字入力で表示]
-
-    datas    : [],  // ex)[{key:--,value:---},{key:--,value:---},{key:--,value:---},...]
-    elements : [    // ex) elm_val(value)->表示,elm_key(key,id)->非表示
-      {
-        elm_val:null, // value値を登録するelement※任意
-        elm_key:null  // key(id)値を登録するelement※任意（key値は無くても可） 
-      } 
-    ],
-    margin   : 0,   // 入力フォームとの距離（margin-top:--px値）
-    attach   : function(){},  // 項目にアタッチした時のイベント処理
-    selected : function(){},  // 項目を選択した後のイベント処理
-    canceled : function(){}   // 項目選択をキャンセルした後のイベント処理
-  };
+  
   $$.prototype.setOptions = function(options){
-    if(!options){return this.options}
+    if(!options){return __options}
     var res = {};
-    for(var i in this.options){
-      res[i] = this.options[i];
+    for(var i in __options){
+      res[i] = __options[i];
     }
     for(var i in options){
       res[i] = options[i];
@@ -230,7 +237,7 @@
     }
 
     // brank_view
-    if(this.datas.branc_view === false){
+    if(this.datas.brank_view === false){
       if(input_value === ""){
         area.style.setProperty("display","none","");
         return;

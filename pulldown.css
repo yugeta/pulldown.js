@@ -6,11 +6,7 @@
   margin:0;
   padding:0;
   box-shadow:2px 2px 2px rgba(0,0,0,0.3);
-  /* counter-reset: num; */
 }
-/* .mynt-pull-down:empty{
-  display:none;
-} */
 .mynt-pull-down > *{
   margin:0;
   padding:2px 8px;
@@ -23,9 +19,3 @@
 .mynt-pull-down > *:hover{
   background-color:#FEE;
 }
-/* .mynt-pull-down > *:before{
-  counter-increment: num;
-  content: counter(num) ". ";
-  pointer-events:none;
-
-} */
