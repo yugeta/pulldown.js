@@ -19,11 +19,20 @@
   list-style:none;
 }
 .mynt-pull-down > *[data-select="1"]{
-  background-color:#EEF;
+  background-color : #FEE;
 }
 .mynt-pull-down > *[data-match="1"]{
-  background-color:#CCF !important;
+  background-color : #EEF;
 }
 .mynt-pull-down > *:hover{
-  background-color:#EEF;
+  background-color : #FEE;
+}
+.mynt-pull-down > *[data-select="1"]:hover{
+  background-color : #EFE;
+}
+.mynt-pull-down > *[data-match="1"]:hover{
+  background-color : #EFE;
+}
+.mynt-pull-down > *[data-match="1"][data-select="1"]{
+  background-color : #EFE !important;
 }

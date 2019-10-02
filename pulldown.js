@@ -49,7 +49,7 @@
     // cancel-event
     if($$pullDown.window_click_flg !== true){
       __event(window , "click" , (function(e){this.event_cancel(e)}).bind(this));
-      __event(window , "keyup" , (function(e){this.event_cursor(e)}).bind(this));
+      // __event(window , "keyup" , (function(e){this.event_cursor(e)}).bind(this));
       $$pullDown.window_click_flg = true;
     }
   };
@@ -121,6 +121,7 @@
     var area = document.createElement("ol");
     area.setAttribute("data-flg-pulldown","1");
     area.className = this.options.class_area;
+    area.setAttribute("data-input_match",this.options.input_match);
     area.style.setProperty("top"  , String(target.offsetTop  + target.offsetHeight + this.options.margin) + "px" , "");
     area.style.setProperty("left" , String(target.offsetLeft) + "px" , "");
     area.style.setProperty("min-width" , String(target.offsetWidth) + "px" , "");
@@ -141,6 +142,7 @@
       }
       list.innerHTML = this.options.datas[i].value;
       area.appendChild(list);
+
       if(this.options.input_match === "multiple"){
         __event(list , "click" , (function(e){this.event_selected_multi(e)}).bind(this));
       }
@@ -195,12 +197,11 @@
       target.setAttribute("data-match","1");
       mode = "add";
     }
+// console.log(mode);
     
-
     var key = target.getAttribute("data-key");
     var val = target.getAttribute("data-val");
     var num = target.getAttribute("data-num");
-
 
     if(typeof this.options.elements[num] === "undefined"){return;}
     if(typeof this.options.elements[num].elm_key !== "undefined"){
@@ -229,11 +230,10 @@
         elm_val.value = lists.join(this.options.mulple_split_string);
       }
     }
-
-    // this.all_close();
     
     this.options.selected(e);
   };
+
 
 
 
@@ -245,8 +245,11 @@
 
   
 
-  // input-match-single
+  // input-match
   $$.prototype.input_match = function(e){
+
+    this.event_cursor(e);
+
     var target = e.target;
     if(!target){return;}
 
@@ -277,7 +280,6 @@
     }
 
     // regexp
-    // var res = null;
     var res = null;
     switch(this.options.input_match){
       case "partial":res = this.input_match_pattern.partial(input_value,lists);break;
@@ -538,11 +540,26 @@
 
       case 13: // enter
         if(current !== null){
+          event.preventDefault();
+
           var val = current.getAttribute("data-val");
           val = (val === null) ? "" : val;
-          document.activeElement.value = val;
-          event.preventDefault();
-          this.all_close();
+          
+          // リストを閉じる
+          if(this.current_input_match() === "multiple"){
+            // var input = document.activeElement;
+            // var attr = input.getAttribute("data-lists");
+            // var lists = (attr) ? JSON.parse(attr) : [];
+            this.event_selected_multi({currentTarget:current});
+
+
+            // console.log(current);
+            // __event(list , "click" , (function(e){this.event_selected_multi(e)}).bind(this));
+          }
+          else{//console.log("close : "+this.options.input_match);
+            document.activeElement.value = val;
+            this.all_close();
+          }
         }
         break;
     }
@@ -550,6 +567,14 @@
     if(next !== null){
       this.area_scroll(next);
     }
+  };
+
+  // 
+  $$.prototype.current_input_match = function(){
+    // 現在表示されているリスト
+    var target = document.querySelector("."+this.options.class_area);
+    // リスト親から"data-input_match"を取得
+    return target.getAttribute("data-input_match");
   };
 
 
