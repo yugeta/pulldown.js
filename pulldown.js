@@ -18,6 +18,7 @@
 
     input_match : "partial",  // ["partial":部分一致 , "forward":前方一致 , "always":常に全部表示 , "multiple":複数選択モード]
     brank_view  : true,       // [true:ブランクで表示 , false:文字入力で表示]
+    readonly    : false,
     multiple_split_string : ",", // 1項目に複数入力する際のsplit文字列(input_matchが"multiple"の場合に使用)
 
     datas    : [],  // ex)[{key:--,value:---},{key:--,value:---},{key:--,value:---},...]
@@ -61,7 +62,7 @@
         elm_val.setAttribute("data-flg-pulldown","1");
         elm_val.setAttribute("data-num" , i);
         elm_val.autocomplete = "off";
-        if(this.options.input_match === "multiple"){
+        if(this.options.readonly === true){
           elm_val.readOnly = true;
         }
         // input-match
