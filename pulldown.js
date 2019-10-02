@@ -16,11 +16,9 @@
   var __options = {
     class_area : "mynt-pull-down",  // 表示されたリストの親element用class名
 
-    input_match : "partial",  // ["partial":部分一致 , "forward":前方一致 , "always":常に全部表示]
+    input_match : "partial",  // ["partial":部分一致 , "forward":前方一致 , "always":常に全部表示 , "multiple":複数選択モード]
     brank_view  : true,       // [true:ブランクで表示 , false:文字入力で表示]
-
-    multiple    : false,      // 複数選択を可能にするのフラグ
-    multiple_split_string : ",", // 1項目に複数入力する際のsplit文字列
+    multiple_split_string : ",", // 1項目に複数入力する際のsplit文字列(input_matchが"multiple"の場合に使用)
 
     datas    : [],  // ex)[{key:--,value:---},{key:--,value:---},{key:--,value:---},...]
     elements : [    // ex) elm_val(value)->表示,elm_key(key,id)->非表示
@@ -63,14 +61,11 @@
         elm_val.setAttribute("data-flg-pulldown","1");
         elm_val.setAttribute("data-num" , i);
         elm_val.autocomplete = "off";
+        if(this.options.input_match === "multiple"){
+          elm_val.readOnly = true;
+        }
         // input-match
-        if(this.options.multiple === true){
-          __event(elm_val , "keyup" , (function(e){this.input_match_multi(e)}).bind(this));
-        }
-        else{
-          __event(elm_val , "keyup" , (function(e){this.input_match_single(e)}).bind(this));
-        }
-        
+        __event(elm_val , "keyup" , (function(e){this.input_match(e)}).bind(this));
       }
     }
   };
@@ -91,7 +86,6 @@
 
   // close
   $$.prototype.all_close = function(){
-    // if(this.options.multiple === true){return}
     var elms = document.querySelectorAll("." + this.options.class_area);
     for(var i=0; i<elms.length; i++){
       elms[i].parentNode.removeChild(elms[i]);
@@ -117,12 +111,7 @@
     var area = this.event_attach_makeLists(target , num);
 
     // 入力文字列チェック
-    if(this.options.multiple === true){
-      this.input_match_multi(e);
-    }
-    else{
-      this.input_match_single(e);
-    }
+    this.input_match(e);
     
     return area;
   }
@@ -151,7 +140,7 @@
       }
       list.innerHTML = this.options.datas[i].value;
       area.appendChild(list);
-      if(this.options.multiple === true){
+      if(this.options.input_match === "multiple"){
         __event(list , "click" , (function(e){this.event_selected_multi(e)}).bind(this));
       }
       else{
@@ -256,10 +245,9 @@
   
 
   // input-match-single
-  $$.prototype.input_match_single = function(e){
+  $$.prototype.input_match = function(e){
     var target = e.target;
     if(!target){return;}
-    
 
     var area = document.querySelector("."+this.options.class_area);
     if(!area){
@@ -288,19 +276,16 @@
     }
 
     // regexp
+    // var res = null;
     var res = null;
     switch(this.options.input_match){
-      case "partial":
-        res = this.input_match_pattern.partial(input_value,lists);
-        break;
-      case "forward":
-        res = this.input_match_pattern.forward(input_value,lists);
-        break;
+      case "partial":res = this.input_match_pattern.partial(input_value,lists);break;
+      case "forward":res = this.input_match_pattern.forward(input_value,lists);break;
+      case "multiple":res = this.input_match_pattern.multiple(target,lists);break;
       case "always":
-      default:
-        res = this.input_match_pattern.always(input_value,lists);
-        break;
+      default:res = this.input_match_pattern.always(input_value,lists);break;
     }
+    if(res === null){return;}
 
     // empty
     var diff = lists.length - res.hidden_count;
@@ -328,88 +313,7 @@
       }
     }
   };
-  // input-match-multi
-  $$.prototype.input_match_multi = function(e){
-    var target = e.target;
-    if(!target){return;}
-    
 
-    var area = document.querySelector("."+this.options.class_area);
-    if(!area){
-      area = this.event_attach(e);
-      area.style.setProperty("display","none","");
-    }
-
-    var lists = area.querySelectorAll(":scope > li");
-    if(!lists || !lists.length){return;}
-
-    var input_string = target.getAttribute("data-lists");
-    var input_values = [];
-    if(input_string ===  null){
-      this.setKeyElement_clear(e);
-      this.input_match_pattern.clear(lists);
-    }
-    else{
-      input_values = JSON.parse(input_string);
-    }
-
-    // brank_view
-    if(this.options.brank_view === false){
-      if(input_string === ""){
-        area.style.setProperty("display","none","");
-        return;
-      }
-      else{
-        area.style.setProperty("display","block","");
-      }
-    }
-// console.log(input_string);
-// console.log(input_values);
-    for(var i=0; i<input_values.length; i++){
-      // regexp
-      var res = null;
-      switch(this.options.input_match){
-        case "partial":
-          res = this.input_match_pattern.partial(input_values[i],lists);
-          break;
-        case "forward":
-          res = this.input_match_pattern.forward(input_values[i],lists);
-          break;
-        case "always":
-        default:
-          res = this.input_match_pattern.always(input_values[i],lists);
-          break;
-      }
-console.log(res);
-
-      // empty
-      var diff = lists.length - res.hidden_count;
-      if(diff === 0){
-        area.style.setProperty("display","none","");
-      }
-      // 入力後に１つだけリスト表示されない処理
-      else if(diff === 1 && res.value_match !== false){
-        area.style.setProperty("display","none","");
-      }
-      else{
-        area.style.setProperty("display","block","");
-      }
-
-      // not-key(id)
-      var num = (document.activeElement) ? document.activeElement.getAttribute("data-num") : null;
-
-      if(num !== null && typeof this.options.elements[num] !== "undefined" && this.options.elements[num].elm_key){
-        var elm_key = document.querySelector(this.options.elements[num].elm_key);
-        if(res.value_match === false){
-          elm_key.value = "";
-        }
-        else if(res.value_match !== false && diff === 1){
-          elm_key.value = lists[res.value_match].getAttribute("data-key");
-        }
-      }
-    }
-    
-  };
   $$.prototype.input_match_pattern = {
     clear : function(lists){
       for(var i=0; i<lists.length; i++){
@@ -453,7 +357,6 @@ console.log(res);
       }
       
       return {
-        input_value  : input_value,
         hidden_count : hidden_count,
         value_match  : value_match
       };
@@ -484,7 +387,7 @@ console.log(res);
         value_match  : value_match
       };
     },
-    forward : function(){
+    forward : function(input_value,lists){
       reg = new RegExp("^"+input_value , "i");
       var hidden_count = 0;
       var value_match = false;
@@ -508,6 +411,40 @@ console.log(res);
       return {
         hidden_count : hidden_count,
         value_match  : value_match
+      };
+    },
+    multiple : function(target,lists){
+      var input_value = target.getAttribute("data-lists");
+      var input_values = [];
+      if(input_value !== null){
+        input_values = JSON.parse(input_value);
+      }
+      var hidden_count = 0;
+      var value_matches = [];
+      var first_match = null;
+
+      for(var i=0; i<lists.length; i++){
+        if(!input_values.length){continue;}
+
+        var val = lists[i].getAttribute("data-val");
+        if(val === ""){continue;}
+        var scroll_flg = false;
+
+        if(input_values.indexOf(val) !== -1){
+          lists[i].setAttribute("data-match" , "1");
+          scroll_flg = true;
+          if(first_match === null){
+            this.firstMatch_scroll(lists[i]);
+            value_matches.push(lists[i]);
+          }
+        }
+        else{
+          lists[i].setAttribute("data-match" , "0");
+        }
+      }
+      return {
+        hidden_count : hidden_count,
+        value_match  : value_matches
       };
     }
   };
