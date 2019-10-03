@@ -17,6 +17,7 @@
   padding:2px 8px;
   cursor:pointer;
   list-style:none;
+  text-align:left;
 }
 .mynt-pull-down > *[data-select="1"]{
   background-color : #FEE;
