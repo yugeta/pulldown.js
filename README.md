@@ -5,6 +5,7 @@ pulldown.js
 - Version
 - ver 1.0 : remake
 - ver 1.1 : multiple
+- ver 1.2 : smart-phone (click -> ontouchend)
 ---
 
 # Sample

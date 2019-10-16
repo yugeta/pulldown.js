@@ -48,7 +48,14 @@
     
     // cancel-event
     if($$pullDown.window_click_flg !== true){
-      __event(window , "click" , (function(e){this.event_cancel(e)}).bind(this));
+
+      if(typeof window.ontouchend !== "undefined"){
+        __event(window , "touchend" , (function(e){this.event_cancel(e)}).bind(this));
+      }
+      else{
+        __event(window , "click" , (function(e){this.event_cancel(e)}).bind(this));
+      }
+      
       // __event(window , "keyup" , (function(e){this.event_cursor(e)}).bind(this));
       $$pullDown.window_click_flg = true;
     }
@@ -58,7 +65,13 @@
     for(var i=0; i<this.options.elements.length; i++){
       var elm_val = (this.options.elements[i].elm_val) ? document.querySelector(this.options.elements[i].elm_val) : null;
       if(elm_val){
-        __event(elm_val , "focus" , (function(e){this.event_attach(e)}).bind(this));
+        // __event(elm_val , "focus" , (function(e){this.event_attach(e)}).bind(this));
+        if(typeof window.touchend !== "undefined"){
+          __event(elm_val , "touchend" , (function(e){this.event_attach(e)}).bind(this));
+        }
+        else{
+          __event(elm_val , "mouseup" , (function(e){this.event_attach(e)}).bind(this));
+        }
         elm_val.setAttribute("data-flg-pulldown","1");
         elm_val.setAttribute("data-num" , i);
         elm_val.autocomplete = "off";
