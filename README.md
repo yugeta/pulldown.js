@@ -53,7 +53,7 @@ new $$pullDown({
 # Caution
   - multiple=trueの場合は、readonlyモードになる。
     入力項目の自動モードが発動するため、readonlyになるため、selectタグと同じ挙動になる。
-    
+
 
 # Request
   - スマホの操作感をselectタグに近づける

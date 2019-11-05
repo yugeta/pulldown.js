@@ -200,7 +200,7 @@
         lists.setAttribute_keyExist(li , main.options.datas[i] , num);
       }
       else{
-        lists.setAttribute_keynoexist(li , main.options.datas[i] , num);
+        lists.setAttribute_keyNoexist(li , main.options.datas[i] , num);
       }
       li.innerHTML = main.options.datas[i].value;
       area.appendChild(li);
