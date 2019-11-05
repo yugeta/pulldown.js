@@ -1,4 +1,4 @@
-.mynt-pull-down{
+.mynt-pulldown{
   border:1px solid #ccc;
   background-color:white;
   border-radius:4px;
@@ -12,28 +12,28 @@
   overflow-y:auto;
 }
 
-.mynt-pull-down > *{
+.mynt-pulldown > *{
   margin:0;
   padding:2px 8px;
   cursor:pointer;
   list-style:none;
   text-align:left;
 }
-.mynt-pull-down > *[data-select="1"]{
+.mynt-pulldown > *[data-select="1"]{
   background-color : #FEE;
 }
-.mynt-pull-down > *[data-match="1"]{
+.mynt-pulldown > *[data-match="1"]{
   background-color : #EEF;
 }
-.mynt-pull-down > *:hover{
+.mynt-pulldown > *:hover{
   background-color : #FEE;
 }
-.mynt-pull-down > *[data-select="1"]:hover{
+.mynt-pulldown > *[data-select="1"]:hover{
   background-color : #EFE;
 }
-.mynt-pull-down > *[data-match="1"]:hover{
+.mynt-pulldown > *[data-match="1"]:hover{
   background-color : #EFE;
 }
-.mynt-pull-down > *[data-match="1"][data-select="1"]{
+.mynt-pulldown > *[data-match="1"][data-select="1"]{
   background-color : #EFE !important;
 }

@@ -24,7 +24,7 @@ pulldown.js
     2. false
 
   - multiple
-  
+
   - multiple_split_string
 
 
@@ -50,9 +50,15 @@ new $$pullDown({
 });
 ```
 
+# Caution
+  - multiple=trueの場合は、readonlyモードになる。
+    入力項目の自動モードが発動するため、readonlyになるため、selectタグと同じ挙動になる。
+    
+
 # Request
   - スマホの操作感をselectタグに近づける
     * 入力完了時にクリックしなくても自動でリスト表示を閉じたい
   - リストにない文字列を入力した際にUIで新規登録とわかり易くしたい
-  - 
+  - 都道府県リストの追加（ajax読み込みで容量軽減対応）
+
 

@@ -55,21 +55,6 @@
   <input type="text" name="listonly_val" placeholder="value">
 
 <script>
-new $$pullDown({
-  datas    : [{key:1,value:"1-abc"},{key:2,value:"2-ade"},{key:3,value:"1-bef"}],  // ex)[{key:value},{key:value},{key:value},...]
-  input_match : "forward",  // ["partial":部分一致 , "forward":前方一致]
-  brank_view  : false,       // [true:ブランクで表示 , false:文字入力で表示]
-  elements : [    // ex) elm_val(value)->表示,elm_key(key,id)->非表示
-    {
-      elm_key : "[name='aaa_key']", // value値を登録するelement※任意
-      elm_val : "[name='aaa_val']"  // key(id)値を登録するelement※任意（key値は無くても可） 
-    } 
-  ]
-  // attach   : function(e){console.log("attach-1")},  // 項目にアタッチした時のイベント処理
-  // selected : function(e){console.log("select-1")},  // 項目を選択した後のイベント処理
-  // canceled : function(e){console.log("cancel-1")}   // 項目選択をキャンセルした後のイベント処理
-});
-
 
 var datas = [
   {key:1,value:"test-10"},
@@ -84,7 +69,48 @@ var datas = [
   {key:10,value:"hage-100"}
 ];
 
+var datas2 = [
+  {key:11,value:"北海道"},
+  {key:12,value:"青森県"},
+  {key:13,value:"秋田県"},
+  {key:14,value:"岩手県"},
+  {key:15,value:"愛媛県"},
+  {key:16,value:"香川県"},
+  {key:17,value:"高知県"},
+  {key:18,value:"徳島県"},
+  {key:19,value:"東京都"},
+  {key:1,value:"たなか"},
+  {key:2,value:"すずき"},
+  {key:3,value:"さいとう"},
+  {key:4,value:"なかた"},
+  {key:5,value:"うえだ"},
+  {key:6,value:"ふじた"},
+  {key:7,value:"まえだ"},
+  {key:8,value:"やすだ"},
+  {key:9,value:"わたなべ"}
+];
 
+
+
+new $$pullDown({
+  datas    : [{key:1,value:"1-abc"},{key:2,value:"2-ade"},{key:3,value:"1-bef"},{key:4,value:"1-abcd"}],  // ex)[{key:value},{key:value},{key:value},...]
+  input_match : "forward", // ["partial":部分一致 , "forward":前方一致]
+  brank_view  : true,      // [true:ブランクで表示 , false:文字入力で表示]
+  readonly    : false,     // 対象項目を全てreadonlyにセットする
+  listonly    : false ,    // リストに無い項目は登録不可
+  all_view    : true ,     // リストを常に全部表示
+  multiple    : true ,    // 複数選択モード
+
+  elements : [    // ex) elm_val(value)->表示,elm_key(key,id)->非表示
+    {
+      elm_key : "[name='aaa_key']", // value値を登録するelement※任意
+      elm_val : "[name='aaa_val']"  // key(id)値を登録するelement※任意（key値は無くても可） 
+    } 
+  ]
+  // attach   : function(e){console.log("attach-1")},  // 項目にアタッチした時のイベント処理
+  // selected : function(e){console.log("select-1")},  // 項目を選択した後のイベント処理
+  // canceled : function(e){console.log("cancel-1")}   // 項目選択をキャンセルした後のイベント処理
+});
 
 new $$pullDown({
   datas    : [{key:1,value:"test-1"},{key:2,value:"hoge-2"},{key:3,value:"hage-3"}],
@@ -116,27 +142,6 @@ new $$pullDown({
     }
   ]
 });
-
-var datas2 = [
-  {key:11,value:"北海道"},
-  {key:12,value:"青森県"},
-  {key:13,value:"秋田県"},
-  {key:14,value:"岩手県"},
-  {key:15,value:"愛媛県"},
-  {key:16,value:"香川県"},
-  {key:17,value:"高知県"},
-  {key:18,value:"徳島県"},
-  {key:19,value:"東京都"},
-  {key:1,value:"たなか"},
-  {key:2,value:"すずき"},
-  {key:3,value:"さいとう"},
-  {key:4,value:"なかた"},
-  {key:5,value:"うえだ"},
-  {key:6,value:"ふじた"},
-  {key:7,value:"まえだ"},
-  {key:8,value:"やすだ"},
-  {key:9,value:"わたなべ"}
-];
 
 new $$pullDown({
   datas    : datas2,
