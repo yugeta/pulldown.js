@@ -1,10 +1,3 @@
-/**
- * PullDown.js
- * - Author : Yugeta.Koji
- * - Version
- *   1.0 @ 2019.08.27 : Basic-systems
- *   1.1 @ 2019.10.01 : Multiple-mode
- */
 ;$$pullDown = (function(){
   var __event = function(target, mode, func){
 		if (target.addEventListener){target.addEventListener(mode, func, false)}
@@ -14,21 +7,24 @@
 
   // options
   var __options = {
-    class_area : "mynt-pull-down",  // 表示されたリストの親element用class名
-
-    input_match : "partial",  // ["partial":部分一致 , "forward":前方一致 , "always":常に全部表示 , "multiple":複数選択モード]
+    class_area  : "mynt-pull-down",  // 表示されたリストの親element用class名
+    // mode        : "",         // リスト表示モード["always": , "multiple":複数選択モード]
+    input_match : "partial",  // ["partial":部分一致 , "forward":前方一致]
     brank_view  : true,       // [true:ブランクで表示 , false:文字入力で表示]
     readonly    : false,
+    listonly    : false ,      // リストに無い項目は登録不可
+    all_view    : true ,      // 常に全部表示
+    multiple    : false ,     // 複数選択モード
     multiple_split_string : ",", // 1項目に複数入力する際のsplit文字列(input_matchが"multiple"の場合に使用)
 
-    datas    : [],  // ex)[{key:--,value:---},{key:--,value:---},{key:--,value:---},...]
-    elements : [    // ex) elm_val(value)->表示,elm_key(key,id)->非表示
+    datas    : [],            // ex)[{key:--,value:---},{key:--,value:---},{key:--,value:---},...]
+    elements : [              // ex) elm_val(value)->表示,elm_key(key,id)->非表示
       {
-        elm_val:null, // value値を登録するelement※任意
-        elm_key:null  // key(id)値を登録するelement※任意（key値は無くても可） 
-      } 
+        elm_val:null,         // value値を登録するelement※任意
+        elm_key:null          // key(id)値を登録するelement※任意（key値は無くても可） 
+      }
     ],
-    margin   : 0,   // 入力フォームとの距離（margin-top:--px値）
+    margin   : 0,             // 入力フォームとの距離（margin-top:--px値）
     attach   : function(){},  // 項目にアタッチした時のイベント処理
     selected : function(){},  // 項目を選択した後のイベント処理
     canceled : function(){}   // 項目選択をキャンセルした後のイベント処理
@@ -61,6 +57,7 @@
     }
   };
 
+  // イベント、属性セット
   $$.prototype.set = function(e){
     for(var i=0; i<this.options.elements.length; i++){
       var elm_val = (this.options.elements[i].elm_val) ? document.querySelector(this.options.elements[i].elm_val) : null;
@@ -80,12 +77,15 @@
         }
         // input-match
         __event(elm_val , "keyup" , (function(e){this.input_match(e)}).bind(this));
+//          __event(elm_val , "keypress" , (function(e){this.input_match(e)}).bind(this));
+        // listonly
+        __event(elm_val , "blur" , (function(e){this.blur(e)}).bind(this));
       }
     }
   };
 
 
-
+  // optionsセット
   $$.prototype.setOptions = function(options){
     if(!options){return __options}
     var res = {};
@@ -129,6 +129,7 @@
     
     return area;
   }
+
   // focus-single
   $$.prototype.event_attach_makeLists = function(target , num){
     var area = document.createElement("ol");
@@ -189,8 +190,10 @@
       }
     }
 
+    // リストを閉じる
     this.all_close();
     
+    // 選択時イベントを実行
     this.options.selected(e);
   };
 
@@ -344,7 +347,7 @@
     },
 
     always : function(input_value,lists){
-      reg = new RegExp(input_value , "i");
+      var reg = new RegExp(input_value , "i");
       var hidden_count = 0;
       var value_match = false;
       var first_match = null;
@@ -378,7 +381,7 @@
       };
     },
     partial : function(input_value,lists){
-      reg = new RegExp(input_value , "i");
+      var reg = new RegExp(input_value , "i");
       var hidden_count = 0;
       var value_match = false;
       for(var i=0; i<lists.length; i++){
@@ -605,6 +608,107 @@
     var head = document.getElementsByTagName("head");
     head[0].appendChild(link);
   }
+
+  // event-blur
+  $$.prototype.blur = function(e){
+    // 複数選択の場合は、現バージョンでは処理しない(ver1.3)
+    if(this.options.multiple === true){return}
+
+    this.setData_val2key(e);
+    this.listonly(e);
+  };
+
+  // blur data-set value -> key-data
+  $$.prototype.setData_val2key = function(e){
+    // 入力項目
+    var val_elm = e.target;
+    if(!val_elm){return;}
+
+    // key-elmの取得
+    var key_elm = this.getElement_val2key(val_elm);
+    if(!key_elm){return;}
+
+    // 未入力の場合は、keyデータもクリアして処理終了
+    if(val_elm.value === ""){
+      key_elm.value = "";
+      return;
+    }
+
+    // value値をデータリストから検索
+    var flg = 0;
+    for(var i=0; i<this.options.datas.length; i++){
+      if(this.options.datas[i].value !== val_elm.value){continue;}
+      flg++;
+      key_elm.value = this.options.datas[i].key;
+      break;
+    }
+    if(flg){return}
+
+    // フラグが無い場合は、一番最初にマッチしたデータを強制選択
+    var reg = new RegExp(val_elm.value , "i");
+    for(var i=0; i<this.options.datas.length; i++){
+      switch(this.options.input_match){
+        // 前方一致
+        case "forward":
+          if(this.options.datas[i].value.match(reg)){
+            val_elm.value = this.options.datas[i].value;
+            key_elm.value = this.options.datas[i].key;
+            return;
+          }
+          break;
+        // 部分一致
+        default:
+          if(this.options.datas[i].value.indexOf(val_elm.value) !== -1){
+            val_elm.value = this.options.datas[i].value;
+            key_elm.value = this.options.datas[i].key;
+            return;
+          }
+          break;
+      }
+    }
+
+  };
+
+  // list-only
+  $$.prototype.listonly = function(e){
+    if(typeof this.options.listonly === "undefined"){return}
+    if(this.options.listonly !== true){return}
+
+    var val_elm = e.target;
+    if(!val_elm){return;}
+
+    // key-elmの取得
+    var key_elm = this.getElement_val2key(val_elm);
+    if(!key_elm){return;}
+
+    // 未入力の場合は、処理終了
+    if(val_elm.value === ""){
+      return;
+    }
+
+    // データ検索マッチしていなければ、value値を削除
+    var flg = 0;
+    for(var i=0; i<this.options.datas.length; i++){
+      if(this.options.datas[i].value !== val_elm.value){continue;}
+      flg++;
+      break;
+    }
+    if(!flg){
+      val_elm.value = "";
+    }
+    
+    
+  };
+
+  // val-elementからkey-elementを取得
+  $$.prototype.getElement_val2key = function(val_elm){
+    var num = val_elm.getAttribute("data-num");
+    if(typeof this.options.elements[num] !== "undefined"
+    && typeof this.options.elements[num].elm_key !== "undefined"){
+      return document.querySelector(this.options.elements[num].elm_key);
+    }
+    return null;
+  };
 
 
   return $$;
