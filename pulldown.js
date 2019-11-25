@@ -529,13 +529,6 @@
     else if(main.options.input_match === "forward"){
       res = pettern.forward(main,input_value,elements);
     }
-    // switch(main.options.input_match){
-    //   case "partial"  : res = pettern.partial(main,input_value,elements);  break;
-    //   case "forward"  : res = pettern.forward(main,input_value,elements);  break;
-    //   // case "multiple" : res = pettern.multiple(main,target,elements); break;
-    //   // case "always"   :
-    //   // default         : res = pettern.always(input_value,elements);   break;
-    // }
     if(res === null){return;}
 
     // empty
@@ -544,7 +537,8 @@
       area.style.setProperty("display","none","");
     }
     // 入力後に１つだけリスト表示されない処理
-    else if(diff === 1 && res.value_match !== false){
+    else if(main.options.last1_input === true
+    && diff === 1 && res.value_match !== false){
       area.style.setProperty("display","none","");
     }
     // 
