@@ -32,19 +32,30 @@ pulldown.js
 # Sample
 ```
 new $$pullDown({
-  datas    : [
+  datas    : [  // ex)[{key:value},{key:value},{key:value},...]
     {key:1,value:"1-abc"},
     {key:2,value:"2-ade"},
     {key:3,value:"1-bef"}
-  ],  // ex)[{key:value},{key:value},{key:value},...]
+  ],
+
+  class_area  : "mynt-pulldown",  // 表示されたリストの親element用class名
   input_match : "partial",  // ["partial":部分一致 , "forward":前方一致]
-  branc_view  : false,       // [true:ブランクで表示 , false:文字入力で表示]
-  elements : [    // ex) elm_val(value)->表示,elm_key(key,id)->非表示
+  brank_view  : false,      // [true:ブランクで表示 , false:文字入力で表示]
+  readonly    : false,      // 入力不可にしてリスト選択のみにする。
+  listonly    : false ,     // リストに無い項目は登録不可
+  all_view    : false ,     // 常に全部表示
+  multiple    : false ,     // 複数選択モード
+  last1_input : false,      // リストが最後の１つになったら自動的に入力にする。（新規入力が不可の場合に使用すると効果的だが、登録完了の感覚がないのでデフォルトはfalse）
+  multiple_split : ",",     // 1項目に複数入力する際のsplit文字列(input_matchが"multiple"の場合に使用)
+  margin   : 0,             // 入力フォームとの距離（margin-top:--px値）
+
+  elements : [ // ex) elm_val(value)->表示,elm_key(key,id)->非表示
     {
-      elm_key : "[name='aaa_key']", // value値を登録するelement※任意
+      elm_key : "[name='aaa_key']", // value値を登録するelement※任意だが記述する場合はvalと対にelementが存在している事
       elm_val : "[name='aaa_val']"  // key(id)値を登録するelement※任意（key値は無くても可） 
     } 
   ],
+
   attach   : function(e){console.log("attach-1")},  // 項目にアタッチした時のイベント処理
   selected : function(e){console.log("select-1")},  // 項目を選択した後のイベント処理
   canceled : function(e){console.log("cancel-1")}   // 項目選択をキャンセルした後のイベント処理
