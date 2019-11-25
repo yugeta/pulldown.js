@@ -8,6 +8,7 @@ pulldown.js
 - ver 1.1 : multiple
 - ver 1.2 : smart-phone (click -> ontouchend)
 - ver 1.3 : リストに無い項目は登録不可 (2019.10.22) *keyが無い場合も含む
+- ver 1.4 : iOSがkeyupに対応していない件の対応 -> input-eventを利用
 ```
 
 # Specification
@@ -60,5 +61,6 @@ new $$pullDown({
     * 入力完了時にクリックしなくても自動でリスト表示を閉じたい
   - リストにない文字列を入力した際にUIで新規登録とわかり易くしたい
   - 都道府県リストの追加（ajax読み込みで容量軽減対応）
-
+  - リストが1個の時にリスト表示されない事象を表示するように解消
+  
 

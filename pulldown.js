@@ -13,6 +13,38 @@
 		if (target.addEventListener){target.addEventListener(mode, func, false)}
 		else{target.attachEvent('on' + mode, function(){func.call(target , window.event)})}
   };
+
+  //指定したエレメントの座標を取得
+	LIB.prototype.pos = function(e,t){
+
+		//エレメント確認処理
+		if(!e){return null;}
+
+		//途中指定のエレメントチェック（指定がない場合はbody）
+		if(typeof(t)=='undefined' || t==null){
+			t = document.body;
+		}
+
+		//デフォルト座標
+		var pos={x:0,y:0};
+		do{
+			//指定エレメントでストップする。
+			if(e == t){break}
+
+			//対象エレメントが存在しない場合はその辞典で終了
+			if(typeof(e)=='undefined' || e==null){return pos;}
+
+			//座標を足し込む
+			pos.x += e.offsetLeft;
+			pos.y += e.offsetTop;
+		}
+
+		//上位エレメントを参照する
+		while(e = e.offsetParent);
+
+		//最終座標を返す
+		return pos;
+	};
   
 
   // ----------
@@ -101,8 +133,9 @@
         }
 
         // input-match
-        lib.event(elm_val , "keyup" , (function(main,e){new INPUT().check(main,e)}).bind(this,main));
-//          lib.(elm_val , "keypress" , (function(e){this.input_match(e)}).bind(main));
+        lib.event(elm_val , "input" , (function(main,e){new INPUT().check(main,e)}).bind(this,main));
+        // lib.event(elm_val , "keyup" , (function(main,e){new INPUT().check(main,e)}).bind(this,main));
+        // lib.(elm_val , "keypress" , (function(e){this.input_match(e)}).bind(main));
 
         // listonly
         if(main.options.listonly === true){
@@ -193,6 +226,7 @@
 
     var area = lists.make_area(main,target);
     target.parentElement.appendChild(area);
+
     for(var i=0; i<main.options.datas.length; i++){
       var li = document.createElement("li");
       area.setAttribute("data-flg-pulldown","1");
@@ -212,18 +246,30 @@
         lib.event(li , "click" , (function(main,e){new LISTS().single(main,e)}).bind(this,main));
       }
     }
+
+    // 座標調整
+    var x = area.offsetLeft;
+    var w = area.offsetWidth;
+    x = (x + w <= window.innerWidth) ? x : x - ((x + w) - window.innerWidth);
+    area.style.setProperty("left" , x + "px" , "");
+
     return area;
   };
 
   // list-areaのprototypeやattributeの設定
   LISTS.prototype.make_area = function(main , target){
+    var pos  = new LIB().pos(target);
     var area = document.createElement("ol");
     area.setAttribute("data-flg-pulldown","1");
     area.className = main.options.class_area;
     area.setAttribute("data-input_match",main.options.input_match);
-    area.style.setProperty("top"  , String(target.offsetTop  + target.offsetHeight + main.options.margin) + "px" , "");
-    area.style.setProperty("left" , String(target.offsetLeft) + "px" , "");
+    var y = pos.y + target.offsetHeight + main.options.margin - document.body.scrollTop;
+    var x = pos.x;
+
+    area.style.setProperty("top"  , y + "px" , "");
+    area.style.setProperty("left" , x + "px" , "");
     area.style.setProperty("min-width" , String(target.offsetWidth) + "px" , "");
+    area.style.setProperty("max-width" , window.innerWidth + "px" , "");
     return area;
   };
 
@@ -687,7 +733,9 @@
     var target = e.target;
     if(target.value !== ""){return}
     var num = target.getAttribute("data-num");
-    if(typeof main.options.elements[num] === "undefined"){return}
+    if(typeof main.options.elements[num] === "undefined"
+    || typeof main.options.elements[num].elm_key === "undefined"
+    || !main.options.elements[num].elm_key){return}
     var key = document.querySelector(main.options.elements[num].elm_key);
     key.value = "";
   };
