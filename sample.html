@@ -36,6 +36,8 @@
   <br>
   <input type="text" name="ccc_key[]" placeholder="key">
   <input type="text" name="ccc_val[]" placeholder="value">
+  <br>
+  <input type="text" name="ddd_val[]" placeholder="value">
   <hr>
 
   <p>複数選択</p>
@@ -129,6 +131,9 @@ new $$pullDown({
       elm_key : "[name='ccc_key[]']",
       elm_val : "[name='ccc_val[]']"
     },
+    {
+      elm_val : "[name='ddd_val[]']"
+    }
   ]
 });
 

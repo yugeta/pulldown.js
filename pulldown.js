@@ -112,6 +112,8 @@
     // var event = new EVENT();
     // var input = new INPUT();
 
+    // var cnt = 0;
+
     for(var i=0; i<main.options.elements.length; i++){
       if(!main.options.elements[i].elm_val){continue;}
       var elm_vals = document.querySelectorAll(this.options.elements[i].elm_val);
@@ -121,7 +123,7 @@
       // 
       for(var j=0; j<elm_vals.length; j++){
         if(elm_vals[j] && !elm_vals[j].getAttribute("data-flg-pulldown")){
-          var elm_vals_id = btoa((+new Date())+"_"+i+"_"+j);
+          var elm_vals_id = btoa((+new Date()) +"_"+ main.options.elements[i].elm_val +"_"+ j);
 
           // lib.(elm_val , "focus" , (function(main,e){new EVENT().attach(main,e)}).bind(this,main));
           if(typeof window.touchend !== "undefined"){
@@ -435,7 +437,7 @@
     }
   };
 
-  // list-only
+  // list-only　リストに無い項目は登録できない設定がtrueの処理
   LISTS.prototype.only = function(main,e){
     var main  = main;
     var input = new INPUT();
@@ -551,7 +553,9 @@
     var elm_id = target.getAttribute("data-flg-pulldown");
 
     // key項目の内容を自動修正
-    if(elm_id !== null && typeof main.options.elements[elm_num] !== "undefined" && main.options.elements[elm_num].elm_key){
+    if(elm_id !== null
+    && typeof main.options.elements[elm_num] !== "undefined"
+    && main.options.elements[elm_num].elm_key){
       // var elm_key = document.querySelector(main.options.elements[elm_num].elm_key);
       var elm_key = document.querySelector("[data-type-pulldown='key'][data-flg-pulldown='"+elm_id+"']");
 
@@ -688,7 +692,7 @@
     lists.only(main,e);
   };
 
-  // blur data-set value -> key-data
+  // blur data-set value -> key-data (*keyがある場合のみの処理)
   INPUT.prototype.set_val2key = function(main,e){
     var main  = main;
     var input = this;

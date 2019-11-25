@@ -9,6 +9,7 @@ pulldown.js
 - ver 1.2 : smart-phone (click -> ontouchend)
 - ver 1.3 : リストに無い項目は登録不可 (2019.10.22) *keyが無い場合も含む
 - ver 1.4 : iOSがkeyupに対応していない件の対応 -> input-eventを利用
+- ver 1.5 : 同一name値の対応
 ```
 
 # Specification
