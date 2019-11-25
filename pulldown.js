@@ -109,39 +109,52 @@
   MAIN.prototype.set = function(e){
     var main  = this;
     var lib   = new LIB();
-    var event = new EVENT();
-    var input = new INPUT();
+    // var event = new EVENT();
+    // var input = new INPUT();
 
     for(var i=0; i<main.options.elements.length; i++){
-      var elm_val = (main.options.elements[i].elm_val) ? document.querySelector(this.options.elements[i].elm_val) : null;
-      if(elm_val){
+      if(!main.options.elements[i].elm_val){continue;}
+      var elm_vals = document.querySelectorAll(this.options.elements[i].elm_val);
+      if(!elm_vals.length){continue}
+      var elm_keys = (this.options.elements[i].elm_key) ? document.querySelectorAll(this.options.elements[i].elm_key) : [];
 
-        // lib.(elm_val , "focus" , (function(main,e){new EVENT().attach(main,e)}).bind(this,main));
-        if(typeof window.touchend !== "undefined"){
-          lib.event(elm_val , "touchend" , (function(main,e){new EVENT().attach(main,e)}).bind(this,main));
+      // 
+      for(var j=0; j<elm_vals.length; j++){
+        if(elm_vals[j] && !elm_vals[j].getAttribute("data-flg-pulldown")){
+          var elm_vals_id = btoa((+new Date())+"_"+i+"_"+j);
+
+          // lib.(elm_val , "focus" , (function(main,e){new EVENT().attach(main,e)}).bind(this,main));
+          if(typeof window.touchend !== "undefined"){
+            lib.event(elm_vals[j] , "touchend" , (function(main,e){new EVENT().attach(main,e)}).bind(this,main));
+          }
+          else{
+            lib.event(elm_vals[j] , "mouseup"  , (function(main,e){new EVENT().attach(main,e)}).bind(this,main));
+          }
+  
+          elm_vals[j].setAttribute("data-type-pulldown","val");
+          elm_vals[j].setAttribute("data-flg-pulldown",elm_vals_id);
+          if(elm_keys.length && typeof elm_keys[j] !== "undefined" && elm_keys[j]){
+            elm_keys[j].setAttribute("data-type-pulldown","key");
+            elm_keys[j].setAttribute("data-flg-pulldown",elm_vals_id);
+          }
+          elm_vals[j].setAttribute("data-num" , i);
+          elm_vals[j].autocomplete = "off";
+  
+          if(main.options.readonly === true || main.options.multiple === true){
+            elm_vals[j].readOnly = true;
+          }
+  
+          // input-match
+          lib.event(elm_vals[j] , "input" , (function(main,e){new INPUT().check(main,e)}).bind(this,main));
+          // lib.event(elm_val , "keyup" , (function(main,e){new INPUT().check(main,e)}).bind(this,main));
+          // lib.(elm_val , "keypress" , (function(e){this.input_match(e)}).bind(main));
+  
+          // listonly
+          if(main.options.listonly === true){
+            lib.event(elm_vals[j] , "blur" , (function(main,e){new INPUT().blur(main,e)}).bind(this,main));
+          }
+          
         }
-        else{
-          lib.event(elm_val , "mouseup"  , (function(main,e){new EVENT().attach(main,e)}).bind(this,main));
-        }
-
-        elm_val.setAttribute("data-flg-pulldown","1");
-        elm_val.setAttribute("data-num" , i);
-        elm_val.autocomplete = "off";
-
-        if(main.options.readonly === true || main.options.multiple === true){
-          elm_val.readOnly = true;
-        }
-
-        // input-match
-        lib.event(elm_val , "input" , (function(main,e){new INPUT().check(main,e)}).bind(this,main));
-        // lib.event(elm_val , "keyup" , (function(main,e){new INPUT().check(main,e)}).bind(this,main));
-        // lib.(elm_val , "keypress" , (function(e){this.input_match(e)}).bind(main));
-
-        // listonly
-        if(main.options.listonly === true){
-          lib.event(elm_val , "blur" , (function(main,e){new INPUT().blur(main,e)}).bind(this,main));
-        }
-        
       }
     }
   };
@@ -171,6 +184,17 @@
     
   };
 
+  // セット後にelementを追加（動的form対応）
+  MAIN.prototype.addElements = function(elements){
+    var main = this;
+    if(elements && elements.length){
+      for(var i=0; i<elements.length; i++){
+        main.options.elements.push(elements[i]);
+      }
+    }
+    main.set();
+  };
+
 
 
 
@@ -190,12 +214,13 @@
     var target = e.currentTarget;
     if(!target){return}
     var num = target.getAttribute("data-num");
+    var id  = target.getAttribute("data-flg-pulldown");
 
     // close
     lists.close(main);
 
     // pull-down-areaの作成
-    var area = lists.open(main , target , num);
+    var area = lists.open(main , target , num , id);
 
     // 入力文字列チェック
     input.check(main,e);
@@ -208,7 +233,7 @@
     var main  = main;
     var lists = new LISTS();
 
-    if(e.target.getAttribute("data-flg-pulldown") === "1"){return;}
+    if(e.target.getAttribute("data-flg-pulldown") !== null){return;}
     lists.close(main);
   };
 
@@ -219,7 +244,7 @@
 
   // ----------
   // focus-single
-  LISTS.prototype.open = function(main , target , num){
+  LISTS.prototype.open = function(main , target , num , id){
     var main  = main;
     var lib   = new LIB();
     var lists = new LISTS();
@@ -231,10 +256,10 @@
       var li = document.createElement("li");
       area.setAttribute("data-flg-pulldown","1");
       if(typeof main.options.datas[i].key !== "undefined"){
-        lists.setAttribute_keyExist(li , main.options.datas[i] , num);
+        lists.setAttribute_keyExist(li , main.options.datas[i] , num , id);
       }
       else{
-        lists.setAttribute_keyNoexist(li , main.options.datas[i] , num);
+        lists.setAttribute_keyNoexist(li , main.options.datas[i] , num , id);
       }
       li.innerHTML = main.options.datas[i].value;
       area.appendChild(li);
@@ -274,16 +299,18 @@
   };
 
   // list項目の属性セット（key要素有り）
-  LISTS.prototype.setAttribute_keyExist = function(li , data , num){
+  LISTS.prototype.setAttribute_keyExist = function(li , data , num , id){
     li.setAttribute("data-key" , data.key);
     li.setAttribute("data-val" , data.value);
     li.setAttribute("data-num" , num);
+    li.setAttribute("data-id"  , id);
     li.setAttribute("data-flg-pulldown" , "1");
   };
   // list項目の属性セット（key要素無し）
-  LISTS.prototype.setAttribute_keyNoexist = function(li , data , num){
+  LISTS.prototype.setAttribute_keyNoexist = function(li , data , num , id){
     li.setAttribute("data-val" , data.value);
     li.setAttribute("data-num" , num);
+    li.setAttribute("data-id"  , id);
     li.setAttribute("data-flg-pulldown" , "1");
   };
 
@@ -308,16 +335,20 @@
     var key = target.getAttribute("data-key");
     var val = target.getAttribute("data-val");
     var num = target.getAttribute("data-num");
+    var id  = target.getAttribute("data-id");
 
     if(typeof main.options.elements[num] === "undefined"){return;}
     if(typeof main.options.elements[num].elm_key !== "undefined"){
-      var elm = document.querySelector(main.options.elements[num].elm_key);
+      // var elm_vals_id = main.options.elements[num].elm_val;
+      // var elm = document.querySelector(main.options.elements[num].elm_key);
+      var elm = document.querySelector("[data-type-pulldown='key'][data-flg-pulldown='"+id+"']");
       if(elm){
         elm.value = key;
       }
     }
     if(typeof main.options.elements[num].elm_val !== "undefined"){
-      var elm = document.querySelector(main.options.elements[num].elm_val);
+      // var elm = document.querySelector(main.options.elements[num].elm_val);
+      var elm = document.querySelector("[data-type-pulldown='val'][data-flg-pulldown='"+id+"']");
       if(elm){
         elm.value = val;
       }
@@ -353,10 +384,12 @@
     var key = target.getAttribute("data-key");
     var val = target.getAttribute("data-val");
     var num = target.getAttribute("data-num");
+    var id  = target.getAttribute("data-id");
 
     if(typeof main.options.elements[num] === "undefined"){return;}
     if(typeof main.options.elements[num].elm_key !== "undefined"){
-      var elm_key = document.querySelector(main.options.elements[num].elm_key);
+      // var elm_key = document.querySelector(main.options.elements[num].elm_key);
+      var elm_key = document.querySelector("[data-type-pulldown='key'][data-flg-pulldown='"+id+"']");
       if(elm_key){
         var lists_json = elm_key.getAttribute("data-lists");
         var lists = (lists_json) ? JSON.parse(lists_json) : [];
@@ -369,7 +402,8 @@
       }
     }
     if(typeof main.options.elements[num].elm_val !== "undefined"){
-      var elm_val = document.querySelector(main.options.elements[num].elm_val);
+      // var elm_val = document.querySelector(main.options.elements[num].elm_val);
+      var elm_val = document.querySelector("[data-type-pulldown='val'][data-flg-pulldown='"+id+"']");
       if(elm_val){
         var lists_json = elm_val.getAttribute("data-lists");
         var lists = (lists_json) ? JSON.parse(lists_json) : [];
@@ -519,11 +553,13 @@
     }
 
     // 現在入力中の項目から設定form番号を取得 : not-key(id)
-    var num = (document.activeElement) ? document.activeElement.getAttribute("data-num") : null;
+    var elm_num = (document.activeElement) ? document.activeElement.getAttribute("data-num") : null;
+    var elm_id = target.getAttribute("data-flg-pulldown");
 
     // key項目の内容を自動修正
-    if(num !== null && typeof main.options.elements[num] !== "undefined" && main.options.elements[num].elm_key){
-      var elm_key = document.querySelector(main.options.elements[num].elm_key);
+    if(elm_id !== null && typeof main.options.elements[elm_num] !== "undefined" && main.options.elements[elm_num].elm_key){
+      // var elm_key = document.querySelector(main.options.elements[elm_num].elm_key);
+      var elm_key = document.querySelector("[data-type-pulldown='key'][data-flg-pulldown='"+elm_id+"']");
 
       if(res.value_match === false){
         elm_key.value = "";
@@ -722,7 +758,9 @@
     var num = val_elm.getAttribute("data-num");
     if(typeof main.options.elements[num] !== "undefined"
     && typeof main.options.elements[num].elm_key !== "undefined"){
-      return document.querySelector(main.options.elements[num].elm_key);
+      var elm_id = val_elm.getAttribute("[data-flg-pulldown]");
+      return document.querySelector("[data-type-pulldown='key'][data-flg-pulldown='"+elm_id+"']");
+      // return document.querySelector(main.options.elements[num].elm_key);
     }
     return null;
   };
@@ -736,8 +774,12 @@
     if(typeof main.options.elements[num] === "undefined"
     || typeof main.options.elements[num].elm_key === "undefined"
     || !main.options.elements[num].elm_key){return}
-    var key = document.querySelector(main.options.elements[num].elm_key);
-    key.value = "";
+    var elm_id = target.getAttribute("[data-flg-pulldown]");
+    var key = document.querySelector("[data-type-pulldown='key'][data-flg-pulldown='"+elm_id+"']");
+    // var key = document.querySelector(main.options.elements[num].elm_key);
+    if(key){
+      key.value = "";
+    }
   };
 
 
